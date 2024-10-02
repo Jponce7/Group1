@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+/.vite
+
+# Vite build output
+/dist
+
+# Editor directories and files
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files
+.DS_Store
+
+# Firebase cache
+.firebase/
+
+# Vite specific
+.vite/
+
+# Metadata
+_metadata.json
+
+# Optional: Uncomment if you want to ignore lock files
+# package-lock.json
+# yarn.lock
