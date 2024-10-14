@@ -1,12 +1,13 @@
 import React from 'react';
-import ExitButton from '../components/ExitButton'; 
+import ExitButton from '../components/ExitButton';
+import GameMissingLetters from '../components/GameMissingLetters';
 
 function MissingLetters() {
   return (
-    <div style={{ position: 'relative', height: '100vh' }}> {}
-    <ExitButton />
+    <div style={{ position: 'relative', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <ExitButton />
       <h1>Missing Letters</h1>
-      <p></p>
+      <GameMissingLetters />
     </div>
   );
 }
