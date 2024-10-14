@@ -1,0 +1,36 @@
+.game-missingletters {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .word {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .word input {
+    width: 40px;
+    text-align: center;
+    font-size: 18px;
+  }
+  
+  .controls {
+    margin-top: 20px;
+  }
+  
+  .start-screen,
+  .game-over,
+  .won-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
