@@ -1,129 +1,114 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateProfileGameProgress } from '../store/profilesSlice'; // Assuming you have this
-import { db } from '../firebase/config'; // Assuming you’re using Firestore
-import './GameMissingLetters.css'; // Create a CSS file for styling
+import { updateProfileGameProgress } from '../store/profilesSlice';
+import './GameMissingLetters.css';
+import { db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 
 const GameMissingLetters = () => {
   const dispatch = useDispatch();
-
-  // Get the active profile from Redux store
   const activeProfile = useSelector((state) => state.profiles.activeProfile);
 
-  // Game states
-  const [word, setWord] = useState('HELLO'); // Default word for demo purposes
-  const [missingIndices, setMissingIndices] = useState([1, 3]); // Indices where letters are missing
-  const [userInput, setUserInput] = useState(Array(word.length).fill(''));
+  // State variables for the game
+  const [letters, setLetters] = useState([]);
+  const [currentWord, setCurrentWord] = useState('');
+  const [missingLetters, setMissingLetters] = useState([]);
+  const [userInputs, setUserInputs] = useState([]);
   const [gameState, setGameState] = useState('start');
-  const [lives, setLives] = useState(3);
-  const [timeRemaining, setTimeRemaining] = useState(60); // Optional timer
 
-  // Handle input change
-  const handleChange = (value, index) => {
-    const updatedInput = [...userInput];
-    updatedInput[index] = value.toUpperCase();
-    setUserInput(updatedInput);
+  // Fetch word data from Firestore (Example Firestore structure)
+  const fetchWordData = async () => {
+    try {
+      const wordRef = doc(db, 'games', 'missing_letters', 'words', '001');
+      const wordSnap = await getDoc(wordRef);
+      if (wordSnap.exists()) {
+        return wordSnap.data();
+      } else {
+        console.error('Word data does not exist');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching word data:', error);
+      return null;
+    }
   };
 
-  // Check if the user's input is correct
-  const checkAnswer = () => {
-    let isCorrect = true;
-    missingIndices.forEach((index) => {
-      if (userInput[index] !== word[index]) {
-        isCorrect = false;
+  // Initialize game
+  const initializeGame = async () => {
+    setGameState('loading');
+    const data = await fetchWordData();
+    if (data) {
+      setCurrentWord(data.word);
+      setMissingLetters(data.missingIndexes);
+      setUserInputs(Array(data.word.length).fill(''));
+      setGameState('playing');
+    } else {
+      setGameState('error');
+    }
+  };
+
+  // Handle user input for missing letters
+  const handleInput = (index, value) => {
+    const newInputs = [...userInputs];
+    newInputs[index] = value;
+    setUserInputs(newInputs);
+  };
+
+  // Check the answers
+  const checkAnswers = () => {
+    let allCorrect = true;
+    missingLetters.forEach((index) => {
+      if (userInputs[index] !== currentWord[index]) {
+        allCorrect = false;
       }
     });
 
-    if (isCorrect) {
+    if (allCorrect) {
       setGameState('won');
-      dispatch(
-        updateProfileGameProgress({
-          profileId: activeProfile.id,
-          game: 'MissingLetters',
-          score: (activeProfile.games.MissingLetters?.score || 0) + 100,
-        })
-      );
+      // Update game progress here
+      dispatch(updateProfileGameProgress({
+        profileId: activeProfile.id,
+        game: 'MissingLetters',
+        score: 100 // Example score
+      }));
     } else {
-      setLives((prevLives) => prevLives - 1);
-      if (lives - 1 === 0) {
-        setGameState('gameOver');
-      }
+      setGameState('retry');
     }
   };
 
-  // Timer effect
   useEffect(() => {
-    let timer;
-    if (timeRemaining > 0 && gameState === 'playing') {
-      timer = setTimeout(() => {
-        setTimeRemaining(timeRemaining - 1);
-      }, 1000);
-    } else if (timeRemaining === 0) {
-      setGameState('gameOver');
-    }
-    return () => clearTimeout(timer);
-  }, [timeRemaining, gameState]);
+    initializeGame();
+  }, []);
 
-  const renderGame = () => (
-    <div className="game-missingletters">
-      <h2>Guess the Missing Letters</h2>
-      <div className="word">
-        {word.split('').map((letter, index) => (
-          <span key={index}>
-            {missingIndices.includes(index) ? (
-              <input
-                type="text"
-                maxLength="1"
-                value={userInput[index]}
-                onChange={(e) => handleChange(e.target.value, index)}
-              />
-            ) : (
-              letter
-            )}
-          </span>
-        ))}
-      </div>
-      <div className="controls">
-        <button onClick={checkAnswer}>Check Answer</button>
-        <p>Lives: {lives}</p>
-        <p>Time Remaining: {timeRemaining}</p>
-      </div>
-    </div>
-  );
-
-  const renderStartScreen = () => (
-    <div className="start-screen">
-      <h2>Welcome to the Missing Letters Game</h2>
-      <button
-        onClick={() => {
-          setGameState('playing');
-        }}
-      >
-        Start Game
-      </button>
-    </div>
-  );
-
-  const renderGameOver = () => (
-    <div className="game-over">
-      <h2>Game Over</h2>
-      <button onClick={() => setGameState('start')}>Back to Menu</button>
-    </div>
-  );
-
-  const renderWonScreen = () => (
-    <div className="won-screen">
-      <h2>Congratulations! You won!</h2>
-      <button onClick={() => setGameState('start')}>Back to Menu</button>
-    </div>
-  );
+  if (!activeProfile) {
+    return <div>Loading profile...</div>;
+  }
 
   return (
-    <div className="game-container">
-      {gameState === 'start' && renderStartScreen()}
-      {gameState === 'playing' && renderGame()}
-      {gameState === 'gameOver' && renderGameOver()}
-      {gameState === 'won' && renderWonScreen()}
+    <div className="game-missingletters">
+      {gameState === 'start' && <button onClick={initializeGame}>Start Game</button>}
+      {gameState === 'playing' && (
+        <div>
+          <h2>Fill in the Missing Letters</h2>
+          <div>
+            {currentWord.split('').map((letter, index) =>
+              missingLetters.includes(index) ? (
+                <input
+                  key={index}
+                  value={userInputs[index]}
+                  onChange={(e) => handleInput(index, e.target.value)}
+                />
+              ) : (
+                <span key={index}>{letter}</span>
+              )
+            )}
+          </div>
+          <button onClick={checkAnswers}>Submit Answers</button>
+        </div>
+      )}
+      {gameState === 'won' && <div>Congratulations! You have completed the challenge.</div>}
+      {gameState === 'retry' && <div>Try Again. <button onClick={initializeGame}>Retry</button></div>}
+      {gameState === 'error' && <div>Error loading game data.</div>}
     </div>
   );
 };
