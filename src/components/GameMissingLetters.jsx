@@ -4,7 +4,7 @@ import { updateProfileGameProgress } from '../store/profilesSlice'; // Assuming 
 import { db } from '../firebase/config'; // Assuming you’re using Firestore
 import './MissingLettersGame.css'; // Create a CSS file for styling
 
-const MissingLettersGame = () => {
+const GameMissingLetters = () => {
   const dispatch = useDispatch();
 
   // Get the active profile from Redux store
@@ -128,4 +128,4 @@ const MissingLettersGame = () => {
   );
 };
 
-export default MissingLettersGame;
+export default GameMissingLetters;
