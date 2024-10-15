@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateProfileGameProgress } from '../store/profilesSlice'; // Assuming you have this
 import { db } from '../firebase/config'; // Assuming you’re using Firestore
-import './MissingLettersGame.css'; // Create a CSS file for styling
+import './GameMissingLetters.css'; // Create a CSS file for styling
 
 const GameMissingLetters = () => {
   const dispatch = useDispatch();
