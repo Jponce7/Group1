@@ -1,11 +1,10 @@
-// src/components/SignupForm.jsx
-
 import React, { useState } from 'react';
 import { auth } from '../firebase/config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../store/usersSlice';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { CirclePicker } from 'react-color';
 import FullPageLoader from './FullPageLoader';
 import './SignupForm.css';
 
@@ -26,6 +25,9 @@ function SignupForm() {
   });
   const [noPersonalData, setNoPersonalData] = useState(false);
   const [error, setError] = useState('');
+
+  // State variable for Favorite Color
+  const [favoriteColor, setFavoriteColor] = useState('#0000FF'); 
 
   function handleCredentials(e) {
     setUserCredentials({ ...userCredentials, [e.target.name]: e.target.value });
@@ -80,6 +82,11 @@ function SignupForm() {
     setUserCredentials({ ...userCredentials, additionalInfo: newAdditionalInfo });
   }
 
+  // Handler for Favorite Color
+  function handleColorChange(color) {
+    setFavoriteColor(color.hex);
+  }
+
   async function setupUserInFirestore(userId, email) {
     const db = getFirestore();
     const userRef = doc(db, 'users', userId);
@@ -98,6 +105,7 @@ function SignupForm() {
           active: true,
           nickname: userCredentials.nickname || 'New Player',
           infoProvided: !noPersonalData,
+          favoriteColor: favoriteColor, // Store favorite color
           games: {
             CardMatching: {
               easy: { level: 1, score: 0 },
@@ -186,9 +194,15 @@ function SignupForm() {
   return (
     <>
       {isLoading && <FullPageLoader />}
-      <form className="signup-form" onSubmit={handleSignup}>
+      <form
+        className="signup-form"
+        onSubmit={handleSignup}
+        style={{ backgroundColor: favoriteColor }}
+      >
         <h2>Sign Up</h2>
         {error && <div className="error">{error}</div>}
+
+        {/* Email */}
         <div className="form-control">
           <label>Email</label>
           <input
@@ -200,6 +214,8 @@ function SignupForm() {
             autoFocus
           />
         </div>
+
+        {/* Password */}
         <div className="form-control">
           <label>Password</label>
           <input
@@ -210,6 +226,8 @@ function SignupForm() {
             required
           />
         </div>
+
+        {/* Confirm Password */}
         <div className="form-control">
           <label>Confirm Password</label>
           <input
@@ -220,6 +238,8 @@ function SignupForm() {
             required
           />
         </div>
+
+        {/* Nickname */}
         <div className="form-control">
           <label>Nickname</label>
           <input
@@ -231,6 +251,28 @@ function SignupForm() {
           />
         </div>
 
+        {/* Favorite Color */}
+        <div className="form-control">
+          <label>Favorite Color</label>
+          <CirclePicker
+            color={favoriteColor}
+            onChangeComplete={handleColorChange}
+            colors={[
+              '#0000FF', // Blue
+              '#FF0000', // Red
+              '#FFFF00', // Yellow
+              '#008000', // Green
+              '#800080', // Purple
+              '#FFA500', // Orange
+              '#FFC0CB', // Pink
+              '#006400', // Dark Green
+              '#89CFF0', // Baby Blue
+              '#A52A2A', // Brown
+            ]}
+          />
+        </div>
+
+        {/* No Personal Data Checkbox */}
         <div className="form-control checkbox-control">
           <label>
             <input
@@ -242,8 +284,10 @@ function SignupForm() {
           </label>
         </div>
 
+        {/* Additional Personal Data Fields */}
         {!noPersonalData && (
           <>
+            {/* Parent's Name */}
             <div className="form-control">
               <label>Parent's Name</label>
               <input
@@ -253,6 +297,7 @@ function SignupForm() {
                 placeholder="Enter parent's name"
               />
             </div>
+            {/* Address */}
             <div className="form-control">
               <label>Address</label>
               <input
@@ -262,6 +307,7 @@ function SignupForm() {
                 placeholder="Enter your address"
               />
             </div>
+            {/* Phone Number */}
             <div className="form-control">
               <label>Phone Number</label>
               <input
@@ -271,6 +317,7 @@ function SignupForm() {
                 placeholder="Enter your phone number"
               />
             </div>
+            {/* Emergency Contact */}
             <div className="form-control">
               <label>Emergency Contact</label>
               <input
@@ -280,6 +327,7 @@ function SignupForm() {
                 placeholder="Enter emergency contact"
               />
             </div>
+            {/* Doctor's Name */}
             <div className="form-control">
               <label>Doctor's Name</label>
               <input
@@ -290,6 +338,7 @@ function SignupForm() {
               />
             </div>
 
+            {/* Additional Information */}
             <div className="additional-info-section">
               <label>Additional Information (Optional):</label>
               {userCredentials.additionalInfo.map((info, index) => (
@@ -314,6 +363,7 @@ function SignupForm() {
           </>
         )}
 
+        {/* Submit Button */}
         <button type="submit" className="btn btn-block">
           Sign Up
         </button>
