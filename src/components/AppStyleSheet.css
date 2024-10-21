@@ -1,83 +1,37 @@
-/* Global Styles */
+/* styles.css */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #1e1e1e;
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    text-align: center;
+    padding: 20px;
 }
 
-.container {
-    text-align: center;
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    gap: 5px;
+    justify-content: center;
     margin-top: 20px;
 }
 
-h1 {
-    color: #ff6f61;
-    margin-bottom: 10px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-    gap: 5px;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.tile {
-    width: 50px;
-    height: 50px;
-    background-color: #444;
-    border: 2px solid #888;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.tile.revealed {
-    background-color: #ff6f61; /* Color when a tile is revealed */
-    color: white;
-    font-size: 1.5em;
+.cell {
+    width: 30px;
+    height: 30px;
+    background-color: #fff;
+    border: 1px solid #ccc;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.tile:hover {
-    transform: scale(1.1);
-}
-
-.status-bar {
-    margin: 20px 0;
-    display: flex;
-    justify-content: space-around;
-    font-size: 1.2em;
-}
-
-.status-bar div {
-    background-color: #333;
-    padding: 10px;
-    border-radius: 8px;
-    width: 30%;
-}
-
-/* Button Styling */
-button {
-    background-color: #ff6f61;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #ff4940;
+.cell.clicked {
+    background-color: #e0e0e0;
 }
+
+#status {
+    margin-top: 20px;
+    font-size: 18px;
+    color: green;
+}
+
