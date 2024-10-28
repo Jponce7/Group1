@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { selectUsers } from '../store/usersSlice';
+import { setActiveProfile, setProfiles } from '../store/profilesSlice';
 import { useNavigate } from 'react-router-dom';
 import './ProfileSelection.css';
 
 function ProfileSelection() {
-  const [profiles, setProfiles] = useState([]);
+  const [localProfiles, setLocalProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const user = useSelector(selectUsers);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -19,7 +21,9 @@ function ProfileSelection() {
         try {
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
-            setProfiles(userSnap.data().profiles || []);
+            const profiles = userSnap.data().profiles || [];
+            setLocalProfiles(profiles);
+            dispatch(setProfiles(profiles)); 
           }
         } catch (error) {
           console.error("Error fetching profiles:", error);
@@ -31,18 +35,18 @@ function ProfileSelection() {
     };
 
     fetchProfiles();
-  }, [user.currentUser]);
+  }, [user.currentUser, dispatch]);
 
   const handleAddProfile = async () => {
-    if (profiles.length < 4) {
+    if (localProfiles.length < 4) {
       setIsLoading(true);
       const db = getFirestore();
       const userRef = doc(db, 'users', user.currentUser.id);
       
       const newProfile = {
-        id: profiles.length + 1,
+        id: localProfiles.length + 1,
         active: false,
-        nickname: `Player ${profiles.length + 1}`,
+        nickname: `Player ${localProfiles.length + 1}`,
         games: {
           CardMatching: { easy: {level: 1, score: 0}, hard: {level: 1, score: 0} },
           MissingLetters: { easy: {level: 1, score: 0}, hard: {level: 1, score: 0} },
@@ -65,7 +69,9 @@ function ProfileSelection() {
         await updateDoc(userRef, {
           profiles: arrayUnion(newProfile)
         });
-        setProfiles([...profiles, newProfile]);
+        const updatedProfiles = [...localProfiles, newProfile];
+        setLocalProfiles(updatedProfiles);
+        dispatch(setProfiles(updatedProfiles));
       } catch (error) {
         console.error("Error adding new profile:", error);
         alert("Failed to add new profile. Please try again.");
@@ -83,14 +89,21 @@ function ProfileSelection() {
     const userRef = doc(db, 'users', user.currentUser.id);
     
     try {
-      const updatedProfiles = profiles.map(profile => ({
+      const updatedProfiles = localProfiles.map(profile => ({
         ...profile,
-        active: profile.id === profileId
+        active: profile.id === profileId,
+        lastLogin: profile.id === profileId ? new Date() : profile.lastLogin
       }));
       
       await updateDoc(userRef, { profiles: updatedProfiles });
-      setProfiles(updatedProfiles);
-      navigate('/'); 
+      
+      setLocalProfiles(updatedProfiles);
+      dispatch(setProfiles(updatedProfiles));
+      
+      const activeProfile = updatedProfiles.find(profile => profile.id === profileId);
+      dispatch(setActiveProfile(activeProfile));
+      
+      navigate('/');
     } catch (error) {
       console.error("Error selecting profile:", error);
       alert("Failed to select profile. Please try again.");
@@ -107,13 +120,13 @@ function ProfileSelection() {
     <div className="profile-selection">
       <h1>Select a Profile</h1>
       <div className="profiles-container">
-        {profiles.map((profile) => (
+        {localProfiles.map((profile) => (
           <div key={profile.id} className="profile-card" onClick={() => handleSelectProfile(profile.id)}>
             <h3>{profile.nickname}</h3>
             {profile.active && <span>(Active)</span>}
           </div>
         ))}
-        {profiles.length < 4 && (
+        {localProfiles.length < 4 && (
           <div className="add-profile-card" onClick={handleAddProfile}>
             <span>+</span>
             <p>Add Profile</p>

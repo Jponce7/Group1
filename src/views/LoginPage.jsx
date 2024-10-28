@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../store/usersSlice';
@@ -8,13 +8,14 @@ import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import logo from '../assets/logo.png';
 import './LoginPage.css';
+import loginScreenBg from '../assets/LoginScreen.png';
 
 function LoginPage() {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const [loginType, setLoginType] = useState('login');
 
-  React.useEffect(() => {
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         dispatch(setUser({ id: user.uid, email: user.email }));
@@ -33,11 +34,13 @@ function LoginPage() {
     <>
       {isLoading && <FullPageLoader />}
       <div className="container login-page">
+        <div className="screensaver">
+        </div>
         <section>
           <h1>
-            <img src={logo} alt="SpectRoom Logo" className="logo" style={{ width: '600px', height: 'auto' }} />
+            <img src={logo} alt="SpectRoom Logo" className="logo" />
           </h1>
-          <p style={{ color: 'white' }}>Login or create an account to continue</p>
+          <p>Login or create an account to continue</p>
           <div className="login-type">
             <button
               className={`btn ${loginType === 'login' ? 'selected' : ''}`}
@@ -52,7 +55,9 @@ function LoginPage() {
               Signup
             </button>
           </div>
-          {loginType === 'login' ? <LoginForm /> : <SignupForm />}
+          <div className="form-container">
+            {loginType === 'login' ? <LoginForm /> : <SignupForm />}
+          </div>
         </section>
       </div>
     </>

@@ -14,6 +14,7 @@ import RevealthePath from './views/RevealthePath';
 import SimonSays from './views/SimonSays';
 import MissingLetters from './views/MissingLetters';
 import SettingsPage from './views/SettingsPage';
+import DebugOverlay from './components/DebugOverlay';
 
 function App() {
   const dispatch = useDispatch();
@@ -53,32 +54,35 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {!user ? (
-          // If not authenticated, show the login page
-          <Route path="*" element={<LoginPage />} />
-        ) : !activeProfile ? (
-          // If authenticated but no active profile, show profile selection
-          <>
-            <Route path="/profileselection" element={<ProfileSelection />} />
-            <Route path="*" element={<Navigate to="/profileselection" replace />} />
-          </>
-        ) : (
-          // Authenticated and has an active profile
-          <>
-            <Route path="/" element={<MainMenu />} />
-            <Route path="/cardmatching" element={<CardMatching />} />
-            <Route path="/revealthepath" element={<RevealthePath />} />
-            <Route path="/simonsays" element={<SimonSays />} />
-            <Route path="/missletters" element={<MissingLetters />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/profileselection" element={<ProfileSelection />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </>
-        )}
-      </Routes>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <Routes>
+          {!user ? (
+            // If not authenticated, show the login page
+            <Route path="*" element={<LoginPage />} />
+          ) : !activeProfile ? (
+            // If authenticated but no active profile, show profile selection
+            <>
+              <Route path="/profileselection" element={<ProfileSelection />} />
+              <Route path="*" element={<Navigate to="/profileselection" replace />} />
+            </>
+          ) : (
+                      // Authenticated and has an active profile
+            <>
+              <Route path="/" element={<MainMenu />} />
+              <Route path="/cardmatching" element={<CardMatching />} />
+              <Route path="/revealthepath" element={<RevealthePath />} />
+              <Route path="/simonsays" element={<SimonSays />} />
+              <Route path="/missletters" element={<MissingLetters />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/profileselection" element={<ProfileSelection />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </>
+          )}
+        </Routes>
+        <DebugOverlay />
+      </BrowserRouter>
+    </>
   );
 }
 

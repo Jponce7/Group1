@@ -1,45 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Header from '../components/Header';
+import { useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog } from '@fortawesome/free-solid-svg-icons';
+import Header from '../components/Header';
+import NotificationPanel from '../components/NotificationPanel';
+import BackgroundMusic from '../components/SoundsMusic';
 import doorImage from '../assets/door.png';
-import { useSelector } from 'react-redux';
+import './MainMenu.css';
 
 function MainMenu() {
-  const textStyle = {
-    fontWeight: 'bold',
-    fontSize: '24px',
-    transform: 'rotate(-2deg)',
-    display: 'block',
-    marginTop: '20px',
-    textTransform: 'uppercase',
-    color: 'white',
-  };
+  
+  const [isOpening, setIsOpening] = useState(Array(4).fill(false));
+  const [isClosing, setIsClosing] = useState(Array(4).fill(false));
 
-  const boxStyle = {
-    padding: '20px',
-    height: '1000px',
-    textAlign: 'center',
-    border: '0px solid black',
-    borderRadius: '0px',
-    cursor: 'pointer',
-    background: `url(${doorImage}) center / cover no-repeat`,
-    color: 'black',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  };
-
-  const containerStyle = {
-    display: 'flex',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginTop: '-150px',
-  };
-
-  // Get the active profile from Redux store
   const activeProfile = useSelector((state) => state.profiles.activeProfile);
 
   const getLevelInfo = (gameName) => {
@@ -53,68 +27,85 @@ function MainMenu() {
     };
   };
 
+  const handleAnimationEnd = (index) => {
+    if (isClosing[index]) {
+      setIsClosing(prev => {
+        const newState = [...prev];
+        newState[index] = false;
+        return newState;
+      });
+    }
+  };
+
   const gameNames = ['CardMatching', 'RevealThePath', 'SimonSays', 'MissingLetters'];
   const paths = ['/cardmatching', '/revealthepath', '/simonsays', '/missletters'];
   const displayNames = ['Card Matching', 'Reveal the Path', 'Simon Says', 'Missing Letters'];
 
   return (
-    <div style={{ position: 'relative', height: '90vh', overflow: 'hidden' }}>
+    <div className="main-menu">
       <Header pageTitle="Main Menu" />
       {activeProfile && (
-        <div style={{ position: 'absolute', top: '20px', left: '20px' }}>
-          <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'white' }}>
-            Welcome, {activeProfile.nickname}!
-          </span>
+        <div className="welcome-message">
+          <span>Welcome, {activeProfile.nickname}!</span>
         </div>
       )}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          marginTop: '50px',
-          justifyContent: 'center',
-        }}
-      >
-        <div style={containerStyle}>
+      <div className="menu-container">
+        <div className="games-container">
           {paths.map((path, index) => {
             const gameName = gameNames[index];
             const levels = getLevelInfo(gameName);
             return (
-              <Link key={index} to={path} style={{ width: '15%', textDecoration: 'none' }}>
-                <div className="menu-box" style={boxStyle}>
-                  <span style={textStyle}>{displayNames[index]}</span>
-                  <div
-                    style={{
-                      marginTop: '10px',
-                      color: 'white',
-                      fontWeight: 'normal',
-                      fontSize: '16px',
-                    }}
-                  >
+              <div key={index} className="game-section">
+                <div className="game-details">
+                  <span className="game-title">{displayNames[index]}</span>
+                  <div className="level-info">
                     Easy: {levels.easy} <br />
                     Hard: {levels.hard}
                   </div>
                 </div>
-              </Link>
+                <Link 
+                  to={path} 
+                  className="door-container"
+                  onMouseEnter={() => {
+                    setIsOpening(prev => {
+                      const newState = [...prev];
+                      newState[index] = true;
+                      return newState;
+                    });
+                    setIsClosing(prev => {
+                      const newState = [...prev];
+                      newState[index] = false;
+                      return newState;
+                    });
+                  }}
+                  onMouseLeave={() => {
+                    setIsOpening(prev => {
+                      const newState = [...prev];
+                      newState[index] = false;
+                      return newState;
+                    });
+                    setIsClosing(prev => {
+                      const newState = [...prev];
+                      newState[index] = true;
+                      return newState;
+                    });
+                  }}
+                >
+                  <div 
+                    className={`door-image ${isOpening[index] ? 'opening' : ''} ${isClosing[index] ? 'closing' : ''}`}
+                    onAnimationEnd={() => handleAnimationEnd(index)}
+                  />
+                </Link>
+              </div>
             );
           })}
         </div>
-        <Link
-          to="/settings"
-          style={{
-            position: 'absolute',
-            bottom: '20px',
-            right: '20px',
-            fontSize: '24px',
-            color: 'black',
-            textDecoration: 'none',
-          }}
-        >
+        <Link to="/settings" className="settings-link">
           <FontAwesomeIcon icon={faCog} />
         </Link>
-        <h1 style={{ position: 'absolute', bottom: '100px' }}>Welcome to SpectRoom</h1>
+        <h1 className="spectroom-title">Welcome to SpectRoom</h1>
       </div>
+      <NotificationPanel />
     </div>
   );
 }

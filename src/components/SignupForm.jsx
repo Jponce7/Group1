@@ -11,80 +11,156 @@ import './SignupForm.css';
 function SignupForm() {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [userCredentials, setUserCredentials] = useState({
+  const [accountInfo, setAccountInfo] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-    nickname: '',
     parentName: '',
-    address: '',
+    streetAddress: '',
+    city: '',
+    state: '',
+    zipCode: '',
     phoneNumber: '',
     emergencyContact: '',
+    secondaryEmergencyContacts: [],
+  });
+  const [profileInfo, setProfileInfo] = useState({
+    nickname: '',
+    allergiesMedicalConditions: '',
+    bloodType: '',
     doctorName: '',
     additionalInfo: [],
+    birthday: '',
+    gradeClass: '',
+    schoolName: '',
+    schoolTeacher: '',
+    schoolBusNumber: '',
+    cardBackPreference: '',
+    soundEffects: '',
+    music: '',
+    favoriteColor: '#0000FF',
   });
   const [noPersonalData, setNoPersonalData] = useState(false);
   const [error, setError] = useState('');
 
-  // State variable for Favorite Color
-  const [favoriteColor, setFavoriteColor] = useState('#0000FF'); 
+  function handleAccountInfo(e) {
+    setAccountInfo({ ...accountInfo, [e.target.name]: e.target.value });
+  }
 
-  function handleCredentials(e) {
-    setUserCredentials({ ...userCredentials, [e.target.name]: e.target.value });
+  function handleProfileInfo(e) {
+    setProfileInfo({ ...profileInfo, [e.target.name]: e.target.value });
   }
 
   function handleNoPersonalDataChange(e) {
-    setNoPersonalData(e.target.checked);
+    const checked = e.target.checked;
+    setNoPersonalData(checked);
 
-    if (e.target.checked) {
+    if (checked) {
       // Set additional fields to null
-      setUserCredentials({
-        ...userCredentials,
+      setAccountInfo({
+        ...accountInfo,
         parentName: null,
-        address: null,
+        streetAddress: null,
+        city: null,
+        state: null,
+        zipCode: null,
         phoneNumber: null,
         emergencyContact: null,
+        secondaryEmergencyContacts: [],
+      });
+      setProfileInfo({
+        ...profileInfo,
+        allergiesMedicalConditions: null,
+        bloodType: null,
         doctorName: null,
         additionalInfo: [],
+        birthday: null,
+        gradeClass: null,
+        schoolName: null,
+        schoolTeacher: null,
+        schoolBusNumber: null,
+        cardBackPreference: null,
+        soundEffects: '',
+        music: '',
+        favoriteColor: '#0000FF',
       });
     } else {
       // Reset fields to empty strings
-      setUserCredentials({
-        ...userCredentials,
+      setAccountInfo({
+        ...accountInfo,
         parentName: '',
-        address: '',
+        streetAddress: '',
+        city: '',
+        state: '',
+        zipCode: '',
         phoneNumber: '',
         emergencyContact: '',
+        secondaryEmergencyContacts: [],
+      });
+      setProfileInfo({
+        ...profileInfo,
+        allergiesMedicalConditions: '',
+        bloodType: '',
         doctorName: '',
         additionalInfo: [],
+        birthday: '',
+        gradeClass: '',
+        schoolName: '',
+        schoolTeacher: '',
+        schoolBusNumber: '',
+        cardBackPreference: '',
+        soundEffects: '',
+        music: '',
+        favoriteColor: '#0000FF',
       });
     }
   }
 
   function handleAdditionalInfoChange(index, e) {
-    const newAdditionalInfo = [...userCredentials.additionalInfo];
+    const newAdditionalInfo = [...profileInfo.additionalInfo];
     newAdditionalInfo[index] = e.target.value;
-    setUserCredentials({ ...userCredentials, additionalInfo: newAdditionalInfo });
+    setProfileInfo({ ...profileInfo, additionalInfo: newAdditionalInfo });
   }
 
   function handleAddField() {
-    if (userCredentials.additionalInfo.length < 5) {
-      setUserCredentials({
-        ...userCredentials,
-        additionalInfo: [...userCredentials.additionalInfo, ''],
+    if (profileInfo.additionalInfo.length < 5) {
+      setProfileInfo({
+        ...profileInfo,
+        additionalInfo: [...profileInfo.additionalInfo, ''],
       });
     }
   }
 
   function handleRemoveField(index) {
-    const newAdditionalInfo = [...userCredentials.additionalInfo];
+    const newAdditionalInfo = [...profileInfo.additionalInfo];
     newAdditionalInfo.splice(index, 1);
-    setUserCredentials({ ...userCredentials, additionalInfo: newAdditionalInfo });
+    setProfileInfo({ ...profileInfo, additionalInfo: newAdditionalInfo });
+  }
+
+  function handleSecondaryEmergencyContactChange(index, e) {
+    const newContacts = [...accountInfo.secondaryEmergencyContacts];
+    newContacts[index] = e.target.value;
+    setAccountInfo({ ...accountInfo, secondaryEmergencyContacts: newContacts });
+  }
+
+  function handleAddSecondaryEmergencyContact() {
+    if (accountInfo.secondaryEmergencyContacts.length < 5) {
+      setAccountInfo({
+        ...accountInfo,
+        secondaryEmergencyContacts: [...accountInfo.secondaryEmergencyContacts, ''],
+      });
+    }
+  }
+
+  function handleRemoveSecondaryEmergencyContact(index) {
+    const newContacts = [...accountInfo.secondaryEmergencyContacts];
+    newContacts.splice(index, 1);
+    setAccountInfo({ ...accountInfo, secondaryEmergencyContacts: newContacts });
   }
 
   // Handler for Favorite Color
   function handleColorChange(color) {
-    setFavoriteColor(color.hex);
+    setProfileInfo({ ...profileInfo, favoriteColor: color.hex });
   }
 
   async function setupUserInFirestore(userId, email) {
@@ -93,19 +169,33 @@ function SignupForm() {
 
     const initialUserData = {
       email: email,
-      parentName: userCredentials.parentName || null,
-      address: userCredentials.address || null,
-      phoneNumber: userCredentials.phoneNumber || null,
-      emergencyContact: userCredentials.emergencyContact || null,
-      doctorName: userCredentials.doctorName || null,
-      additionalInfo: userCredentials.additionalInfo || [],
+      parentName: accountInfo.parentName || null,
+      streetAddress: accountInfo.streetAddress || null,
+      city: accountInfo.city || null,
+      state: accountInfo.state || null,
+      zipCode: accountInfo.zipCode || null,
+      phoneNumber: accountInfo.phoneNumber || null,
+      emergencyContact: accountInfo.emergencyContact || null,
+      secondaryEmergencyContacts: accountInfo.secondaryEmergencyContacts || [],
       profiles: [
         {
           id: 1,
           active: true,
-          nickname: userCredentials.nickname || 'New Player',
+          nickname: profileInfo.nickname || 'New Player',
           infoProvided: !noPersonalData,
-          favoriteColor: favoriteColor, // Store favorite color
+          favoriteColor: profileInfo.favoriteColor || '#0000FF',
+          allergiesMedicalConditions: profileInfo.allergiesMedicalConditions || null,
+          bloodType: profileInfo.bloodType || null,
+          doctorName: profileInfo.doctorName || null,
+          additionalInfo: profileInfo.additionalInfo || [],
+          birthday: profileInfo.birthday || null,
+          gradeClass: profileInfo.gradeClass || null,
+          schoolName: profileInfo.schoolName || null,
+          schoolTeacher: profileInfo.schoolTeacher || null,
+          schoolBusNumber: profileInfo.schoolBusNumber || null,
+          cardBackPreference: profileInfo.cardBackPreference || null,
+          soundEffects: profileInfo.soundEffects || '',
+          music: profileInfo.music || '',
           games: {
             CardMatching: {
               easy: { level: 1, score: 0 },
@@ -124,17 +214,11 @@ function SignupForm() {
               hard: { level: 1, score: 0 },
             },
           },
-          achievements: {
-            achievement01: false,
-            achievement02: false,
-            achievement03: false,
-            achievement04: false,
-            achievement05: false,
-            achievement06: false,
-            achievement07: false,
-            achievement08: false,
-            achievement09: false,
-            achievement10: false,
+          badges: {
+            CardMatching: 0,
+            MissingLetters: 0,
+            RevealThePath: 0,
+            SimonSays: 0,
           },
           lastLogin: new Date(),
           totalPlaytime: {
@@ -143,6 +227,8 @@ function SignupForm() {
             RevealThePath: 0,
             SimonSays: 0,
           },
+          streakTracking: 0,
+          averageSessionDuration: 0,
         },
       ],
     };
@@ -161,13 +247,13 @@ function SignupForm() {
     setError('');
     setIsLoading(true);
 
-    if (userCredentials.password !== userCredentials.confirmPassword) {
+    if (accountInfo.password !== accountInfo.confirmPassword) {
       setError('Passwords do not match');
       setIsLoading(false);
       return;
     }
 
-    if (!userCredentials.nickname.trim()) {
+    if (!profileInfo.nickname.trim()) {
       setError('Nickname is required');
       setIsLoading(false);
       return;
@@ -176,8 +262,8 @@ function SignupForm() {
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
-        userCredentials.email,
-        userCredentials.password
+        accountInfo.email,
+        accountInfo.password
       );
 
       await setupUserInFirestore(userCredential.user.uid, userCredential.user.email);
@@ -194,44 +280,45 @@ function SignupForm() {
   return (
     <>
       {isLoading && <FullPageLoader />}
-      <form
-        className="signup-form"
-        onSubmit={handleSignup}
-        style={{ backgroundColor: favoriteColor }}
-      >
+      <form className="signup-form" onSubmit={handleSignup}>
         <h2>Sign Up</h2>
         {error && <div className="error">{error}</div>}
 
-        {/* Email */}
-        <div className="form-control">
-          <label>Email</label>
-          <input
-            onChange={handleCredentials}
-            type="email"
-            name="email"
-            placeholder="Enter your email"
-            required
-            autoFocus
-          />
-        </div>
+        {/* Account Information */}
+        <h3>Account Information</h3>
 
-        {/* Password */}
-        <div className="form-control">
-          <label>Password</label>
-          <input
-            onChange={handleCredentials}
-            type="password"
-            name="password"
-            placeholder="Enter your password"
-            required
-          />
+        {/* Email */}
+        <div className="form-row">
+          <div className="form-control">
+            <label>Email</label>
+            <input
+              onChange={handleAccountInfo}
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              required
+              autoFocus
+            />
+          </div>
+
+          {/* Password */}
+          <div className="form-control">
+            <label>Password</label>
+            <input
+              onChange={handleAccountInfo}
+              type="password"
+              name="password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
         </div>
 
         {/* Confirm Password */}
         <div className="form-control">
           <label>Confirm Password</label>
           <input
-            onChange={handleCredentials}
+            onChange={handleAccountInfo}
             type="password"
             name="confirmPassword"
             placeholder="Confirm your password"
@@ -239,11 +326,127 @@ function SignupForm() {
           />
         </div>
 
+        {/* No Personal Data Checkbox */}
+        <div className="form-control checkbox-control">
+          <label>
+            <input
+              type="checkbox"
+              checked={noPersonalData}
+              onChange={handleNoPersonalDataChange}
+            />{' '}
+            I prefer not to provide additional personal data.
+          </label>
+        </div>
+
+        {!noPersonalData && (
+          <>
+            {/* Parent's Name */}
+            <div className="form-control">
+              <label>Parent's Name</label>
+              <input
+                onChange={handleAccountInfo}
+                type="text"
+                name="parentName"
+                placeholder="Enter parent's name"
+              />
+            </div>
+
+            {/* Address Fields */}
+            <div className="form-control">
+              <label>Street Address</label>
+              <input
+                onChange={handleAccountInfo}
+                type="text"
+                name="streetAddress"
+                placeholder="Enter street address"
+              />
+            </div>
+
+            <div className="form-row">
+              <div className="form-control">
+                <label>City</label>
+                <input
+                  onChange={handleAccountInfo}
+                  type="text"
+                  name="city"
+                  placeholder="City"
+                />
+              </div>
+              <div className="form-control">
+                <label>State</label>
+                <input
+                  onChange={handleAccountInfo}
+                  type="text"
+                  name="state"
+                  placeholder="State"
+                />
+              </div>
+              <div className="form-control">
+                <label>Zip Code</label>
+                <input
+                  onChange={handleAccountInfo}
+                  type="text"
+                  name="zipCode"
+                  placeholder="Zip Code"
+                />
+              </div>
+            </div>
+
+            {/* Phone Number */}
+            <div className="form-control">
+              <label>Phone Number</label>
+              <input
+                onChange={handleAccountInfo}
+                type="text"
+                name="phoneNumber"
+                placeholder="Enter your phone number"
+              />
+            </div>
+
+            {/* Emergency Contact */}
+            <div className="form-control">
+              <label>Emergency Contact</label>
+              <input
+                onChange={handleAccountInfo}
+                type="text"
+                name="emergencyContact"
+                placeholder="Enter emergency contact"
+              />
+            </div>
+
+            {/* Secondary Emergency Contacts */}
+            <div className="additional-info-section">
+              <label>Secondary Emergency Contacts (Optional):</label>
+              {accountInfo.secondaryEmergencyContacts.map((contact, index) => (
+                <div key={index} className="additional-info">
+                  <input
+                    type="text"
+                    placeholder={`Secondary Emergency Contact ${index + 1}`}
+                    value={contact}
+                    onChange={(e) => handleSecondaryEmergencyContactChange(index, e)}
+                  />
+                  <button type="button" onClick={() => handleRemoveSecondaryEmergencyContact(index)}>
+                    Remove
+                  </button>
+                </div>
+              ))}
+              {accountInfo.secondaryEmergencyContacts.length < 5 && (
+                <button type="button" onClick={handleAddSecondaryEmergencyContact}>
+                  Add More
+                </button>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Profile Information */}
+        <h3>Profile Information</h3>
+
         {/* Nickname */}
         <div className="form-control">
           <label>Nickname</label>
           <input
-            onChange={handleCredentials}
+            onChange={handleProfileInfo}
             type="text"
             name="nickname"
             placeholder="Enter your nickname"
@@ -255,7 +458,7 @@ function SignupForm() {
         <div className="form-control">
           <label>Favorite Color</label>
           <CirclePicker
-            color={favoriteColor}
+            color={profileInfo.favoriteColor}
             onChangeComplete={handleColorChange}
             colors={[
               '#0000FF', // Blue
@@ -272,66 +475,35 @@ function SignupForm() {
           />
         </div>
 
-        {/* No Personal Data Checkbox */}
-        <div className="form-control checkbox-control">
-          <label>
-            <input
-              type="checkbox"
-              checked={noPersonalData}
-              onChange={handleNoPersonalDataChange}
-            />{' '}
-            I prefer not to provide additional personal data.
-          </label>
-        </div>
-
-        {/* Additional Personal Data Fields */}
         {!noPersonalData && (
           <>
-            {/* Parent's Name */}
+            {/* Allergies and Medical Conditions */}
             <div className="form-control">
-              <label>Parent's Name</label>
+              <label>Allergies and Medical Conditions</label>
               <input
-                onChange={handleCredentials}
+                onChange={handleProfileInfo}
                 type="text"
-                name="parentName"
-                placeholder="Enter parent's name"
+                name="allergiesMedicalConditions"
+                placeholder="Enter allergies and medical conditions"
               />
             </div>
-            {/* Address */}
+
+            {/* Blood Type */}
             <div className="form-control">
-              <label>Address</label>
+              <label>Blood Type</label>
               <input
-                onChange={handleCredentials}
+                onChange={handleProfileInfo}
                 type="text"
-                name="address"
-                placeholder="Enter your address"
+                name="bloodType"
+                placeholder="Enter blood type"
               />
             </div>
-            {/* Phone Number */}
-            <div className="form-control">
-              <label>Phone Number</label>
-              <input
-                onChange={handleCredentials}
-                type="text"
-                name="phoneNumber"
-                placeholder="Enter your phone number"
-              />
-            </div>
-            {/* Emergency Contact */}
-            <div className="form-control">
-              <label>Emergency Contact</label>
-              <input
-                onChange={handleCredentials}
-                type="text"
-                name="emergencyContact"
-                placeholder="Enter emergency contact"
-              />
-            </div>
+
             {/* Doctor's Name */}
             <div className="form-control">
               <label>Doctor's Name</label>
               <input
-                onChange={handleCredentials}
+                onChange={handleProfileInfo}
                 type="text"
                 name="doctorName"
                 placeholder="Enter doctor's name"
@@ -341,8 +513,8 @@ function SignupForm() {
             {/* Additional Information */}
             <div className="additional-info-section">
               <label>Additional Information (Optional):</label>
-              {userCredentials.additionalInfo.map((info, index) => (
-                <div key={index} className="form-control additional-info">
+              {profileInfo.additionalInfo.map((info, index) => (
+                <div key={index} className="additional-info">
                   <input
                     type="text"
                     placeholder={`Additional Info ${index + 1}`}
@@ -354,11 +526,66 @@ function SignupForm() {
                   </button>
                 </div>
               ))}
-              {userCredentials.additionalInfo.length < 5 && (
+              {profileInfo.additionalInfo.length < 5 && (
                 <button type="button" onClick={handleAddField}>
                   Add More
                 </button>
               )}
+            </div>
+
+            {/* Birthday and Grade/Class */}
+            <div className="form-row">
+              <div className="form-control">
+                <label>Birthday</label>
+                <input
+                  onChange={handleProfileInfo}
+                  type="date"
+                  name="birthday"
+                  placeholder="Enter birthday"
+                />
+              </div>
+              <div className="form-control">
+                <label>Grade/Class</label>
+                <input
+                  onChange={handleProfileInfo}
+                  type="text"
+                  name="gradeClass"
+                  placeholder="Enter grade or class"
+                />
+              </div>
+            </div>
+
+            {/* School Name */}
+            <div className="form-control">
+              <label>School Name</label>
+              <input
+                onChange={handleProfileInfo}
+                type="text"
+                name="schoolName"
+                placeholder="Enter school name"
+              />
+            </div>
+
+            {/* School Teacher and Bus Number */}
+            <div className="form-row">
+              <div className="form-control">
+                <label>School Teacher</label>
+                <input
+                  onChange={handleProfileInfo}
+                  type="text"
+                  name="schoolTeacher"
+                  placeholder="Enter school teacher"
+                />
+              </div>
+              <div className="form-control">
+                <label>School Bus Number</label>
+                <input
+                  onChange={handleProfileInfo}
+                  type="text"
+                  name="schoolBusNumber"
+                  placeholder="Enter school bus number"
+                />
+              </div>
             </div>
           </>
         )}
