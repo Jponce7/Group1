@@ -4,10 +4,9 @@ import GameMissingLetters from '../components/GameMissingLetters';
 
 function MissingLetters() {
   return (
-    <div style={{ position: 'relative', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ position: 'relative', height: '100vh' }}>
       <ExitButton />
       <h1>Missing Letters</h1>
-      <GameMissingLetters />
     </div>
   );
 }
