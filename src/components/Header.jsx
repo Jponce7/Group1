@@ -75,6 +75,7 @@ function Header() {
           background-color: #A66E5A;
           color: #D9B88F;
           box-shadow: 0 4px 0 #7A4E3D;
+          z-index: 1000; 
         }
 
         .btn:active {

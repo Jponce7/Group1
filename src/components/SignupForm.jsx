@@ -24,8 +24,10 @@ function SignupForm() {
     emergencyContact: '',
     secondaryEmergencyContacts: [],
   });
+
   const [profileInfo, setProfileInfo] = useState({
     nickname: '',
+    profilePicture: 1,
     allergiesMedicalConditions: '',
     bloodType: '',
     doctorName: '',
@@ -40,6 +42,7 @@ function SignupForm() {
     music: '',
     favoriteColor: '#0000FF',
   });
+
   const [noPersonalData, setNoPersonalData] = useState(false);
   const [error, setError] = useState('');
 
@@ -169,6 +172,7 @@ function SignupForm() {
 
     const initialUserData = {
       email: email,
+      infoProvided: !noPersonalData,
       parentName: accountInfo.parentName || null,
       streetAddress: accountInfo.streetAddress || null,
       city: accountInfo.city || null,
@@ -182,7 +186,8 @@ function SignupForm() {
           id: 1,
           active: true,
           nickname: profileInfo.nickname || 'New Player',
-          infoProvided: !noPersonalData,
+          profilePicture: 1,
+          
           favoriteColor: profileInfo.favoriteColor || '#0000FF',
           allergiesMedicalConditions: profileInfo.allergiesMedicalConditions || null,
           bloodType: profileInfo.bloodType || null,
@@ -215,10 +220,15 @@ function SignupForm() {
             },
           },
           badges: {
-            CardMatching: 0,
-            MissingLetters: 0,
-            RevealThePath: 0,
+            EasyCardMatching: 0,
+            EasyMissingLetters: 0,
+            EasyRevealThePath: 0,
             SimonSays: 0,
+            HardCardMatching: 0,
+            HardMissingLetters: 0,
+            HardRevealThePath: 0,
+            HardSimonSays: 0,
+            StreakBadge: 0,
           },
           lastLogin: new Date(),
           totalPlaytime: {
@@ -440,155 +450,153 @@ function SignupForm() {
         )}
 
         {/* Profile Information */}
-        <h3>Profile Information</h3>
+        <div className="profile-section">
+          <h4>Profile Information</h4>
 
-        {/* Nickname */}
-        <div className="form-control">
-          <label>Nickname</label>
-          <input
-            onChange={handleProfileInfo}
-            type="text"
-            name="nickname"
-            placeholder="Enter your nickname"
-            required
-          />
-        </div>
+          {/* Nickname */}
+          <div className="form-control">
+            <label>Nickname</label>
+            <input
+              onChange={handleProfileInfo}
+              type="text"
+              name="nickname"
+              placeholder="Enter your nickname"
+              required
+            />
+          </div>
 
-        {/* Favorite Color */}
-        <div className="form-control">
-          <label>Favorite Color</label>
-          <CirclePicker
-            color={profileInfo.favoriteColor}
-            onChangeComplete={handleColorChange}
-            colors={[
-              '#0000FF', // Blue
-              '#FF0000', // Red
-              '#FFFF00', // Yellow
-              '#008000', // Green
-              '#800080', // Purple
-              '#FFA500', // Orange
-              '#FFC0CB', // Pink
-              '#006400', // Dark Green
-              '#89CFF0', // Baby Blue
-              '#A52A2A', // Brown
-            ]}
-          />
-        </div>
+          {/* Favorite Color */}
+          <div className="form-control">
+            <label>Favorite Color</label>
+            <CirclePicker
+              color={profileInfo.favoriteColor}
+              onChangeComplete={handleColorChange}
+              colors={[
+                '#0000FF', // Blue
+                '#FF0000', // Red
+                '#FFFF00', // Yellow
+                '#008000', // Green
+                '#800080', // Purple
+                '#FFC0CB', // Pink
+              ]}
+            />
+          </div>
 
-        {!noPersonalData && (
-          <>
-            {/* Allergies and Medical Conditions */}
-            <div className="form-control">
-              <label>Allergies and Medical Conditions</label>
-              <input
-                onChange={handleProfileInfo}
-                type="text"
-                name="allergiesMedicalConditions"
-                placeholder="Enter allergies and medical conditions"
-              />
-            </div>
+          {!noPersonalData && (
+            <>
+              {/* Allergies and Medical Conditions */}
+              <div className="form-control">
+                <label>Allergies and Medical Conditions</label>
+                <input
+                  onChange={handleProfileInfo}
+                  type="text"
+                  name="allergiesMedicalConditions"
+                  placeholder="Enter allergies and medical conditions"
+                />
+              </div>
 
-            {/* Blood Type */}
-            <div className="form-control">
-              <label>Blood Type</label>
-              <input
-                onChange={handleProfileInfo}
-                type="text"
-                name="bloodType"
-                placeholder="Enter blood type"
-              />
-            </div>
+              {/* Blood Type */}
+              <div className="form-control">
+                <label>Blood Type</label>
+                <input
+                  onChange={handleProfileInfo}
+                  type="text"
+                  name="bloodType"
+                  placeholder="Enter blood type"
+                />
+              </div>
 
-            {/* Doctor's Name */}
-            <div className="form-control">
-              <label>Doctor's Name</label>
-              <input
-                onChange={handleProfileInfo}
-                type="text"
-                name="doctorName"
-                placeholder="Enter doctor's name"
-              />
-            </div>
+              {/* Doctor's Name */}
+              <div className="form-control">
+                <label>Doctor's Name</label>
+                <input
+                  onChange={handleProfileInfo}
+                  type="text"
+                  name="doctorName"
+                  placeholder="Enter doctor's name"
+                />
+              </div>
 
-            {/* Additional Information */}
-            <div className="additional-info-section">
-              <label>Additional Information (Optional):</label>
-              {profileInfo.additionalInfo.map((info, index) => (
-                <div key={index} className="additional-info">
-                  <input
-                    type="text"
-                    placeholder={`Additional Info ${index + 1}`}
-                    value={info}
-                    onChange={(e) => handleAdditionalInfoChange(index, e)}
-                  />
-                  <button type="button" onClick={() => handleRemoveField(index)}>
-                    Remove
+              {/* Additional Information */}
+              <div className="additional-info-section">
+                <label>Additional Information (Optional):</label>
+                {profileInfo.additionalInfo.map((info, index) => (
+                  <div key={index} className="additional-info">
+                    <input
+                      type="text"
+                      placeholder={`Additional Info ${index + 1}`}
+                      value={info}
+                      onChange={(e) => handleAdditionalInfoChange(index, e)}
+                    />
+                    <button type="button" onClick={() => handleRemoveField(index)}>
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                {profileInfo.additionalInfo.length < 5 && (
+                  <button type="button" onClick={handleAddField}>
+                    Add More
                   </button>
+                )}
+              </div>
+
+              {/* Birthday and Grade/Class */}
+              <div className="form-row">
+                <div className="form-control">
+                  <label>Birthday</label>
+                  <input
+                    onChange={handleProfileInfo}
+                    type="date"
+                    name="birthday"
+                    placeholder="Enter birthday"
+                  />
                 </div>
-              ))}
-              {profileInfo.additionalInfo.length < 5 && (
-                <button type="button" onClick={handleAddField}>
-                  Add More
-                </button>
-              )}
-            </div>
-
-            {/* Birthday and Grade/Class */}
-            <div className="form-row">
-              <div className="form-control">
-                <label>Birthday</label>
-                <input
-                  onChange={handleProfileInfo}
-                  type="date"
-                  name="birthday"
-                  placeholder="Enter birthday"
-                />
+                <div className="form-control">
+                  <label>Grade/Class</label>
+                  <input
+                    onChange={handleProfileInfo}
+                    type="text"
+                    name="gradeClass"
+                    placeholder="Enter grade or class"
+                  />
+                </div>
               </div>
+
+              {/* School Name */}
               <div className="form-control">
-                <label>Grade/Class</label>
+                <label>School Name</label>
                 <input
                   onChange={handleProfileInfo}
                   type="text"
-                  name="gradeClass"
-                  placeholder="Enter grade or class"
+                  name="schoolName"
+                  placeholder="Enter school name"
                 />
               </div>
-            </div>
 
-            {/* School Name */}
-            <div className="form-control">
-              <label>School Name</label>
-              <input
-                onChange={handleProfileInfo}
-                type="text"
-                name="schoolName"
-                placeholder="Enter school name"
-              />
-            </div>
-
-            {/* School Teacher and Bus Number */}
-            <div className="form-row">
-              <div className="form-control">
-                <label>School Teacher</label>
-                <input
-                  onChange={handleProfileInfo}
-                  type="text"
-                  name="schoolTeacher"
-                  placeholder="Enter school teacher"
-                />
+              {/* School Teacher and Bus Number */}
+              <div className="form-row">
+                <div className="form-control">
+                  <label>School Teacher</label>
+                  <input
+                    onChange={handleProfileInfo}
+                    type="text"
+                    name="schoolTeacher"
+                    placeholder="Enter school teacher"
+                  />
+                </div>
+                <div className="form-control">
+                  <label>School Bus Number</label>
+                  <input
+                    onChange={handleProfileInfo}
+                    type="text"
+                    name="schoolBusNumber"
+                    placeholder="Enter school bus number"
+                  />
+                </div>
               </div>
-              <div className="form-control">
-                <label>School Bus Number</label>
-                <input
-                  onChange={handleProfileInfo}
-                  type="text"
-                  name="schoolBusNumber"
-                  placeholder="Enter school bus number"
-                />
-              </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </div>
 
         {/* Submit Button */}
         <button type="submit" className="btn btn-block">

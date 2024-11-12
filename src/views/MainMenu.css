@@ -83,7 +83,8 @@
     bottom: 20px;
     right: 20px;
     font-size: 24px;
-    color: #D9B88F; 
+    color: #D9B88F;
+    z-index: 1000;  
 }
 
 .menu-box:hover {
