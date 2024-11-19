@@ -7,6 +7,7 @@ function MissingLetters() {
     <div style={{ position: 'relative', height: '100vh' }}>
       <ExitButton />
       <h1>Missing Letters</h1>
+      <GameMissingLetters />
     </div>
   );
 }

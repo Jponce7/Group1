@@ -9,6 +9,7 @@ const GameMissingLetters = () => {
   const dispatch = useDispatch();
   const activeProfile = useSelector((state) => state.profiles.activeProfile);
 
+
   // State variables for the game
   const [letters, setLetters] = useState([]);
   const [currentWord, setCurrentWord] = useState('');
@@ -18,19 +19,15 @@ const GameMissingLetters = () => {
 
   // Fetch word data from Firestore (Example Firestore structure)
   const fetchWordData = async () => {
-    try {
-      const wordRef = doc(db, 'games', 'missing_letters', 'words', '001');
-      const wordSnap = await getDoc(wordRef);
-      if (wordSnap.exists()) {
-        return wordSnap.data();
-      } else {
-        console.error('Word data does not exist');
-        return null;
-      }
-    } catch (error) {
-      console.error('Error fetching word data:', error);
-      return null;
-    }
+    // Simulate fetching data by returning a mock object
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          word: 'developer',
+          missingIndexes: [0, 3, 5],
+        });
+      }, 100); // Simulate a small delay
+    });
   };
 
   // Initialize game
