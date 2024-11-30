@@ -223,7 +223,7 @@ function SignupForm() {
             EasyCardMatching: 0,
             EasyMissingLetters: 0,
             EasyRevealThePath: 0,
-            SimonSays: 0,
+            EasySimonSays: 0,
             HardCardMatching: 0,
             HardMissingLetters: 0,
             HardRevealThePath: 0,

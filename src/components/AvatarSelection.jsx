@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import './avatar.css';
 import AvatarDisplay from './AvatarDisplay';
 
-const AvatarSelection = ({ currentAvatar = 1, onSelect }) => {
+const AvatarSelection = ({ currentAvatar = 1, onSelect, disabled = true }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isChanging, setIsChanging] = useState(false);
   const totalAvatars = 4;
 
   const handlePrevious = () => {
+    if (disabled) return;
+    
     setIsChanging(true);
     const newAvatarId = currentAvatar === 1 ? totalAvatars : currentAvatar - 1;
     onSelect(newAvatarId);
@@ -15,37 +17,30 @@ const AvatarSelection = ({ currentAvatar = 1, onSelect }) => {
   };
 
   const handleNext = () => {
+    if (disabled) return;
     setIsChanging(true);
     const newAvatarId = currentAvatar === totalAvatars ? 1 : currentAvatar + 1;
     onSelect(newAvatarId);
     setTimeout(() => setIsChanging(false), 300); 
   };
 
-  const avatarNames = {
-    1: "Skeleton",
-    2: "Penguin",
-    3: "Bear",
-    4: "Ghost"
-  };
-
   return (
-    <div className="avatar-selection">
+    <div className={`avatar-selection ${disabled ? 'disabled' : ''}`}>
       <button 
         className="nav-button prev"
         onClick={handlePrevious}
-        aria-label="Previous avatar"
+        disabled={disabled}
       />
 
       <div className={`avatar-preview ${isChanging ? 'changing' : ''}`}>
-        <div className="avatar-name">{avatarNames[currentAvatar]}</div>
         <div 
           className="avatar-container"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
+          onMouseEnter={() => !disabled && setIsHovered(true)}
+          onMouseLeave={() => !disabled && setIsHovered(false)}
         >
           <AvatarDisplay 
             avatarId={currentAvatar}
-            isAnimating={isHovered}
+            isAnimating={isHovered && !disabled}
             size="lg"
           />
         </div>
@@ -54,7 +49,7 @@ const AvatarSelection = ({ currentAvatar = 1, onSelect }) => {
       <button 
         className="nav-button next"
         onClick={handleNext}
-        aria-label="Next avatar"
+        disabled={disabled}
       />
     </div>
   );

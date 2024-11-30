@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AvatarDisplay from './AvatarDisplay';
+import Badges from './badges';
 import './ProfileCard.css';
 
 function ProfileCard({ profile, onClick }) {
-
-  // Scores
+  const [isHovered, setIsHovered] = useState(false);
+ 
+  const gameOrder = ['CardMatching', 'RevealThePath', 'SimonSays', 'MissingLetters'];
+   // Scores
   const totalScore = Object.values(profile.games || {}).reduce((total, game) => {
     return total + (game.easy?.score || 0) + (game.hard?.score || 0);
   }, 0);
-
+  
   // Badges
   const getBadgeColor = (level) => {
     switch(level) {
@@ -24,6 +27,8 @@ function ProfileCard({ profile, onClick }) {
     <div 
       className="profile-card" 
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{ borderColor: profile.favoriteColor || '#ccc' }}
     >
       <div className="profile-info">
@@ -34,6 +39,7 @@ function ProfileCard({ profile, onClick }) {
         <AvatarDisplay
           avatarId={profile.profilePicture} 
           size="md"
+          isAnimating={isHovered}
         />
       </div>
 
@@ -42,32 +48,44 @@ function ProfileCard({ profile, onClick }) {
       <div className="badges-container">
         {/* Easy Mode Badges  */}
         <div className="badge-row">
-          {['CardMatching', 'MissingLetters', 'RevealThePath', 'SimonSays'].map(game => (
+          {gameOrder.map(game => (
             <div 
               key={`Easy${game}`}
               className="badge"
               style={{ backgroundColor: getBadgeColor(profile.badges[`Easy${game}`]) }}
               title={`Easy ${game}`}
             >
-              E
+              {profile.badges[`Easy${game}`] === 0 ? (
+                <span>E</span>
+              ) : (
+                <Badges 
+                  gameType={game}
+                  level={profile.badges[`Easy${game}`]}
+                />
+              )}
             </div>
           ))}
         </div>
-
         {/* Hard Mode Badges  */}
         <div className="badge-row">
-          {['CardMatching', 'MissingLetters', 'RevealThePath', 'SimonSays'].map(game => (
+          {gameOrder.map(game => (
             <div 
               key={`Hard${game}`}
               className="badge"
               style={{ backgroundColor: getBadgeColor(profile.badges[`Hard${game}`]) }}
               title={`Hard ${game}`}
             >
-              H
+              {profile.badges[`Hard${game}`] === 0 ? (
+                <span>H</span>
+              ) : (
+                <Badges 
+                  gameType={game}
+                  level={profile.badges[`Hard${game}`]}
+                />
+              )}
             </div>
           ))}
         </div>
-
         {/* Streak Badge  */}
         <div className="badge-row streak-row">
           <div 
@@ -75,7 +93,15 @@ function ProfileCard({ profile, onClick }) {
             style={{ backgroundColor: getBadgeColor(profile.badges.StreakBadge) }}
             title={`Streak Badge: ${profile.streakTracking} days`}
           >
-            S
+            {profile.badges.StreakBadge === 0 ? (
+              <span>S</span>
+            ) : (
+              <Badges 
+                gameType="Streak"
+                level={profile.badges.StreakBadge}
+                isStreak={true}
+              />
+            )}
           </div>
         </div>
       </div>
