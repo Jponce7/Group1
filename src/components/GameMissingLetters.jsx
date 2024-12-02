@@ -1,99 +1,113 @@
-// Configuration
-const gridSize = 5;
-const grid = [];
-const player = { x: 0, y: 0 }; // Player starts at the top-left
-const goal = { x: 4, y: 4 }; // Goal is at the bottom-right
-let messageElement;
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateProfileGameProgress } from '../store/profilesSlice';
+import './GameMissingLetters.css';
+import { db } from '../firebase/config';
+import { doc, getDoc } from 'firebase/firestore';
 
-// Generate random correct/incorrect cells
-const generateGrid = () => {
-  for (let y = 0; y < gridSize; y++) {
-    grid[y] = [];
-    for (let x = 0; x < gridSize; x++) {
-      if (x === 0 && y === 0) {
-        grid[y][x] = "start"; // Start position
-      } else if (x === goal.x && y === goal.y) {
-        grid[y][x] = "goal"; // Goal position
-      } else {
-        grid[y][x] = Math.random() > 0.5 ? "correct" : "incorrect";
-      }
-    }
-  }
-};
+const GameMissingLetters = () => {
+  const dispatch = useDispatch();
+  const activeProfile = useSelector((state) => state.profiles.activeProfile);
 
-// Draw the grid
-const drawGrid = () => {
-  const gridElement = document.getElementById("grid");
-  gridElement.innerHTML = ""; // Clear existing cells
-  for (let y = 0; y < gridSize; y++) {
-    for (let x = 0; x < gridSize; x++) {
-      const cell = document.createElement("div");
-      cell.className = "cell";
-      if (x === player.x && y === player.y) {
-        cell.classList.add("player");
-      } else if (grid[y][x] === "goal") {
-        cell.classList.add("goal");
-      } else if (grid[y][x] === "correct") {
-        cell.classList.add("correct");
-      } else if (grid[y][x] === "incorrect") {
-        cell.classList.add("incorrect");
-      }
-      gridElement.appendChild(cell);
-    }
-  }
-};
 
-// Move the player
-const movePlayer = (dx, dy) => {
-  const newX = player.x + dx;
-  const newY = player.y + dy;
+  // State variables for the game
+  const [letters, setLetters] = useState([]);
+  const [currentWord, setCurrentWord] = useState('');
+  const [missingLetters, setMissingLetters] = useState([]);
+  const [userInputs, setUserInputs] = useState([]);
+  const [gameState, setGameState] = useState('start');
 
-  if (newX >= 0 && newX < gridSize && newY >= 0 && newY < gridSize) {
-    const cellType = grid[newY][newX];
+  // Fetch word data from Firestore (Example Firestore structure)
+  const fetchWordData = async () => {
+    // Simulate fetching data by returning a mock object
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          word: 'developer',
+          missingIndexes: [0, 3, 5],
+        });
+      }, 100); // Simulate a small delay
+    });
+  };
 
-    if (cellType === "incorrect") {
-      messageElement.textContent = "Wrong info! Dead end!";
+  // Initialize game
+  const initializeGame = async () => {
+    setGameState('loading');
+    const data = await fetchWordData();
+    if (data) {
+      setCurrentWord(data.word);
+      setMissingLetters(data.missingIndexes);
+      setUserInputs(Array(data.word.length).fill(''));
+      setGameState('playing');
     } else {
-      player.x = newX;
-      player.y = newY;
-      messageElement.textContent = "";
-
-      if (cellType === "correct") {
-        messageElement.textContent = "Correct info! Keep going!";
-      }
-
-      if (newX === goal.x && newY === goal.y) {
-        messageElement.textContent = "You made it home!";
-      }
+      setGameState('error');
     }
-    drawGrid();
+  };
+
+  // Handle user input for missing letters
+  const handleInput = (index, value) => {
+    const newInputs = [...userInputs];
+    newInputs[index] = value;
+    setUserInputs(newInputs);
+  };
+
+  // Check the answers
+  const checkAnswers = () => {
+    let allCorrect = true;
+    missingLetters.forEach((index) => {
+      if (userInputs[index] !== currentWord[index]) {
+        allCorrect = false;
+      }
+    });
+
+    if (allCorrect) {
+      setGameState('won');
+      // Update game progress here
+      dispatch(updateProfileGameProgress({
+        profileId: activeProfile.id,
+        game: 'MissingLetters',
+        score: 100 // Example score
+      }));
+    } else {
+      setGameState('retry');
+    }
+  };
+
+  useEffect(() => {
+    initializeGame();
+  }, []);
+
+  if (!activeProfile) {
+    return <div>Loading profile...</div>;
   }
+
+  return (
+    <div className="game-missingletters">
+      {gameState === 'start' && <button onClick={initializeGame}>Start Game</button>}
+      {gameState === 'playing' && (
+        <div>
+          <h2>Fill in the Missing Letters</h2>
+          <div>
+            {currentWord.split('').map((letter, index) =>
+              missingLetters.includes(index) ? (
+                <input
+                  key={index}
+                  value={userInputs[index]}
+                  onChange={(e) => handleInput(index, e.target.value)}
+                />
+              ) : (
+                <span key={index}>{letter}</span>
+              )
+            )}
+          </div>
+          <button onClick={checkAnswers}>Submit Answers</button>
+        </div>
+      )}
+      {gameState === 'won' && <div>Congratulations! You have completed the challenge.</div>}
+      {gameState === 'retry' && <div>Try Again. <button onClick={initializeGame}>Retry</button></div>}
+      {gameState === 'error' && <div>Error loading game data.</div>}
+    </div>
+  );
 };
 
-// Handle keyboard input
-const handleKeyPress = (event) => {
-  switch (event.key) {
-    case "ArrowUp":
-      movePlayer(0, -1);
-      break;
-    case "ArrowDown":
-      movePlayer(0, 1);
-      break;
-    case "ArrowLeft":
-      movePlayer(-1, 0);
-      break;
-    case "ArrowRight":
-      movePlayer(1, 0);
-      break;
-  }
-};
-
-// Initialize the game
-const initializeGame = () => {
-  messageElement = document.getElementById("message");
-  generateGrid();
-  drawGrid();
-  document.addEventListener("keydown", handleKeyPress);
-};
-
-initializeGame();
+export default GameMissingLetters;
