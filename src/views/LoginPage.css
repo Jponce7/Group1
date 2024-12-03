@@ -29,7 +29,7 @@
   background-color: #474787;
   height: 100%;
   overflow-y: auto;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3); /* Optional: adds depth */
+  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3); 
 }
 
 /*logo*/

@@ -55,7 +55,17 @@
     height: 220px;
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s ease, scale 0.3s ease;
 }
+.game-section:hover .game-details-container {
+    transform: scale(1.2); 
+    z-index: 10; 
+}
+
+.game-section:hover .game-title {
+    transform: scale(1.4);
+}
+
 
 .game-title {
     font-family: 'Press Start 2P', monospace;
@@ -120,6 +130,7 @@
     display: block;
     width: 100%;
     height: 100%;
+
 }
 
 .door-image {
@@ -127,15 +138,18 @@
     height: 100%;
     background: url('../assets/door.png') center / 100% 100% no-repeat;
     image-rendering: pixelated;
-    transition: transform 0.2s ease;
-}
+    transition: transform 0.2s ease, filter 0.3s ease;
+    filter: drop-shadow(0 0 40px rgb(255, 255, 255));
 
+}
 .door-image.opening {
     background: url('../assets/Opening.png');
     background-size: 1230px 300px; 
     image-rendering: pixelated;
     animation: doorOpen 0.7s steps(4) forwards;
     animation-fill-mode: forwards;
+    filter: drop-shadow(0 0 60px rgb(255, 255, 255)) 
+            drop-shadow(0 0 80px rgb(255, 255, 255));
 }
 
 .door-image.closing {
@@ -144,8 +158,8 @@
     image-rendering: pixelated;
     animation: doorClose 0.2s steps(2) forwards;
     animation-fill-mode: forwards;
+    filter: drop-shadow(0 0 40px rgb(255, 255, 255));
 }
-
 .settings-link {
     position: absolute;
     bottom: 20px;
