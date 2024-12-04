@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth } from '../firebase/config';
+import { EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { CirclePicker } from 'react-color';
 import AvatarSelection from '../components/AvatarSelection';
 import './SettingsPage.css';
@@ -12,6 +13,10 @@ function SettingsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState(null);
   const [noPersonalData, setNoPersonalData] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [authError, setAuthError] = useState(null);
+  const [authPassword, setAuthPassword] = useState('');
+  const [isShaking, setIsShaking] = useState(false);
   const [profileData, setProfileData] = useState({
     nickname: '',
     bloodType: '',
@@ -148,6 +153,33 @@ function SettingsPage() {
     }));
   };
 
+  const handleAuthenticate = async (e) => {
+    e.preventDefault();
+    try {
+      const credential = EmailAuthProvider.credential(
+        auth.currentUser.email,
+        authPassword
+      );
+      await reauthenticateWithCredential(auth.currentUser, credential);
+      setIsAuthenticating(false);
+      setIsEditing(true);
+      setAuthPassword('');
+      setAuthError(null);
+    } catch (error) {
+      setAuthError('Incorrect password');
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+    }
+  };
+
+  const handleEditClick = () => {
+    if (!isEditing) {
+      setIsAuthenticating(true);
+    } else {
+      setIsEditing(false);
+    }
+  };
+
   if (isLoading) {
     return <div className="loading-spinner">Loading...</div>;
   }
@@ -210,7 +242,7 @@ function SettingsPage() {
           <div className="personal-details-header">
             <h2>Profile Details</h2>
             <button
-              onClick={() => setIsEditing(!isEditing)}
+              onClick={handleEditClick}
               className={`edit-button ${isEditing ? 'save-button' : ''}`}
             >
               {isEditing ? 'Cancel' : 'Edit'}
@@ -218,7 +250,39 @@ function SettingsPage() {
           </div>
 
           <div className="personal-details">
-            {isEditing ? (
+            {isAuthenticating ? (
+              <div className={`auth-content ${isShaking ? 'shake' : ''}`}>
+                <p className="auth-message">Please enter password to edit settings</p>
+                {authError && <div className="error-message">{authError}</div>}
+                <form onSubmit={handleAuthenticate} className="auth-form">
+                  <div className="form-control">
+                    <input
+                      type="password"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      required
+                    />
+                  </div>
+                  <div className="button-group">
+                    <button type="submit" className="btn-secondary">
+                      Continue
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setIsAuthenticating(false);
+                        setAuthPassword('');
+                        setAuthError(null);
+                      }}
+                      className="btn-secondary"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : isEditing ? (
               <form onSubmit={handleSave}>
                 <div className="form-control">
                   <label>Nickname</label>

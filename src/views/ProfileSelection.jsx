@@ -3,9 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getFirestore, doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { selectUsers } from '../store/usersSlice';
 import { setActiveProfile, setProfiles } from '../store/profilesSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import SignupFormProfile from '../components/SignupFormProfile';
 import ProfileCard from '../components/ProfileCard';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCog } from '@fortawesome/free-solid-svg-icons';
 import './ProfileSelection.css';
 
 
@@ -27,7 +29,7 @@ function ProfileSelection() {
           if (userSnap.exists()) {
             const profiles = userSnap.data().profiles || [];
             setLocalProfiles(profiles);
-            dispatch(setProfiles(profiles)); 
+            dispatch(setProfiles(profiles));
           }
         } catch (error) {
           console.error("Error fetching profiles:", error);
@@ -62,7 +64,7 @@ function ProfileSelection() {
       id: localProfiles.length + 1,
       active: false,
       ...profileInfo,
-      
+
       additionalInfo: [],
       allergiesMedicalConditions: null,
       bloodType: null,
@@ -77,7 +79,7 @@ function ProfileSelection() {
       averageSessionDuration: 0,
       streakTracking: 0,
       lastLogin: new Date(),
-      
+
       games: {
         CardMatching: {
           easy: { level: 1, score: 0 },
@@ -108,7 +110,7 @@ function ProfileSelection() {
         HardSimonSays: 0,
         StreakBadge: 0,
       },
-      
+
       totalPlaytime: {
         CardMatching: 0,
         MissingLetters: 0,
@@ -137,7 +139,7 @@ function ProfileSelection() {
     setIsLoading(true);
     const db = getFirestore();
     const userRef = doc(db, 'users', user.currentUser.id);
-    
+
     try {
       const updatedProfiles = localProfiles.map(profile => ({
         ...profile,
@@ -169,43 +171,44 @@ function ProfileSelection() {
   return (
     <div className="profile-selection">
       <div className="header-actions">
-        <button className="account-settings-btn" onClick={handleAccountSettings}>
-          Account Settings
-        </button>
+        <Link to="/accountsettings" className="account-settings-link">
+          <FontAwesomeIcon icon={faUserCog} />
+          <span className="settings-text">Account Settings</span>
+        </Link>
       </div>
       <div className="profiles-container">
         <div className="profiles-grid">
-          {Array(4).fill(null).map((_, index) => {
-            const profile = localProfiles[index];
-            if (profile) {
-              return (
-                <ProfileCard
-                  key={profile.id}
-                  profile={profile}
-                  onClick={() => handleSelectProfile(profile.id)}
-                />
-              );
-            } else if (index === localProfiles.length && localProfiles.length < 4) {
-              return (
-                <div key="add-profile" className="add-profile-card" onClick={handleAddProfile}>
-                  <span>+</span>
-                  <p>Add Profile</p>
-                </div>
-              );
-            } else {
-              return <div key={`empty-${index}`} className="empty-profile-slot" />;
-            }
-          })}
+        {Array(4).fill(null).map((_, index) => {
+              const profile = localProfiles[index];
+              if (profile) {
+                return (
+                  <ProfileCard
+                    key={profile.id}
+                    profile={profile}
+                    onClick={() => handleSelectProfile(profile.id)}
+                  />
+                );
+              } else if (index === localProfiles.length && localProfiles.length < 4) {
+                return (
+                  <div key="add-profile" className="add-profile-card" onClick={handleAddProfile}>
+                    <span>+</span>
+                    <p>Add Profile</p>
+                  </div>
+                );
+              } else {
+                return <div key={`empty-${index}`} className="empty-profile-slot" />;
+              }
+            })}
         </div>
       </div>
-      
+
       {isSignupFormOpen && (
         <div className="profile-form-overlay">
           <div className="profile-form-container">
             <button className="close-btn" onClick={() => setIsSignupFormOpen(false)}>
               ×
             </button>
-            <SignupFormProfile 
+            <SignupFormProfile
               onSubmit={handleNewProfileSubmit}
               onCancel={() => setIsSignupFormOpen(false)}
               userId={user.currentUser?.id}

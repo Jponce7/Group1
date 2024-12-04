@@ -14,11 +14,12 @@
     font-family: 'Press Start 2P', monospace; 
     color: #D9B88F;
     font-size: 36px;
+    letter-spacing: 10px;
     text-shadow: 
-        -2px -2px 0 #2F2A3F,  
-        2px -2px 0 #2F2A3F,
-        -2px 2px 0 #2F2A3F,
-        2px 2px 0 #2F2A3F;
+        -4px -4px 0 #2F2A3F,  
+        4px -4px 0 #2F2A3F,
+        -4px 4px 0 #2F2A3F,
+        4px 4px 0 #2F2A3F;
 }
 
 .menu-container {
@@ -50,15 +51,18 @@
     border: 4px solid #D9B88F;
     padding: 15px;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 70px;
     box-sizing: border-box;
     height: 220px;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s ease, scale 0.3s ease;
+    transition: transform 1s ease, scale 1s ease, opacity 0.9s ease;
+}
+.game-details-container.dimmed {
+    opacity: 0.3;
 }
 .game-section:hover .game-details-container {
-    transform: scale(1.2); 
+    transform: scale(1.5); 
     z-index: 10; 
 }
 
@@ -78,6 +82,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    white-space: pre-line;
+    line-height: 1.5;
+    transition: transform 0.7s ease, scale 0.8s ease;
 }
 
 .game-stats {
@@ -139,8 +146,15 @@
     background: url('../assets/door.png') center / 100% 100% no-repeat;
     image-rendering: pixelated;
     transition: transform 0.2s ease, filter 0.3s ease;
-    filter: drop-shadow(0 0 40px rgb(255, 255, 255));
-
+    filter: drop-shadow(15px 0px 2px rgba(255, 255, 255, .7))
+            drop-shadow(-15px 0px 2px rgba(255, 255, 255, .7))
+            drop-shadow(0px -20px 2px rgba(255, 255, 255, 0.9));
+            
+    transition: filter 0.7s ease;
+}
+.door-image.dimmed {
+    filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0)); 
+    opacity: .8; 
 }
 .door-image.opening {
     background: url('../assets/Opening.png');
@@ -148,8 +162,9 @@
     image-rendering: pixelated;
     animation: doorOpen 0.7s steps(4) forwards;
     animation-fill-mode: forwards;
-    filter: drop-shadow(0 0 60px rgb(255, 255, 255)) 
-            drop-shadow(0 0 80px rgb(255, 255, 255));
+    filter: drop-shadow(20px -20px 50px rgba(255, 255, 255, 1))
+            drop-shadow(-20px -20px 50px rgba(255, 255, 255, 1))
+            drop-shadow(0px -25px 50px rgba(255, 255, 255, 1));
 }
 
 .door-image.closing {
@@ -158,23 +173,94 @@
     image-rendering: pixelated;
     animation: doorClose 0.2s steps(2) forwards;
     animation-fill-mode: forwards;
-    filter: drop-shadow(0 0 40px rgb(255, 255, 255));
-}
-.settings-link {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    font-size: 24px;
-    color: #D9B88F;
-    z-index: 1000;  
+    filter: drop-shadow(15px -15px 20px rgba(255, 255, 255, 0.5))
+            drop-shadow(-15px -15px 20px rgba(255, 255, 255, 0.5))
+            drop-shadow(0px -20px 20px rgba(255, 255, 255, 0.5));
 }
 
+
+.settings-link {
+    position: absolute;
+    bottom: 50px;
+    right: 100px;
+    font-size: 24px;
+    color: #D9B88F;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    scale: 3.0;
+}
+
+.settings-text {
+    font-family: 'Press Start 2P', monospace;
+    color: #D9B88F;
+    font-size: 8px;
+    text-shadow: 0 0 10px rgba(217, 184, 143, 0.8),
+                 0 0 20px rgba(217, 184, 143, 0.5),
+                 0 0 30px rgba(217, 184, 143, 0.3),
+                 -2px -2px 0 #2F2A3F,  
+                 2px -2px 0 #2F2A3F,
+                 -2px 2px 0 #2F2A3F,
+                 2px 2px 0 #2F2A3F;
+    transform: translateX(30px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    position: absolute;
+    white-space: nowrap;
+    pointer-events: none;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.settings-link svg {
+    animation: cogGlow 2s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 10px rgba(217, 184, 143, 0.8))
+            drop-shadow(0 0 20px rgba(217, 184, 143, 0.5))
+            drop-shadow(0 0 30px rgba(217, 184, 143, 0.3));
+    text-shadow: -2px -2px 0 #2F2A3F,  
+                 2px -2px 0 #2F2A3F,
+                 -2px 2px 0 #2F2A3F,
+                 2px 2px 0 #2F2A3F;
+}
+
+@keyframes cogGlow {
+    from {
+        filter: drop-shadow(0 0 10px rgba(217, 184, 143, 0.5))
+                drop-shadow(0 0 20px rgba(217, 184, 143, 0.3))
+                drop-shadow(0 0 30px rgba(217, 184, 143, 0.2));
+    }
+    to {
+        filter: drop-shadow(0 0 15px rgba(217, 184, 143, 0.8))
+                drop-shadow(0 0 25px rgba(217, 184, 143, 0.5))
+                drop-shadow(0 0 35px rgba(217, 184, 143, 0.3));
+    }
+}
+
+.settings-link:hover .settings-text {
+    transform: translateX(-100%);
+    opacity: 1;
+}
 .spectroom-title {
     position: absolute;
     bottom: 50px;
     font-family: 'Press Start 2P', monospace;
-    color: #5BA58C; 
-    text-shadow: 2px 2px 0 #2F2A3F; 
+    color: #5BA58C;
+    text-shadow: 0 0 10px rgba(91, 165, 140, 0.8),
+                 0 0 20px rgba(91, 165, 140, 0.5),
+                 0 0 30px rgba(91, 165, 140, 0.3),
+                 2px 2px 0 #D9B88F,
+                 -2px -2px 0 #D9B88F,
+                 2px -2px 0 #D9B88F,
+                 -2px 2px 0 #D9B88F,
+                 3px 3px 0 #2F2A3F; 
+    animation: glow 2s ease-in-out infinite alternate;
+    letter-spacing: 10px;
+    font-size: 28px;
+    scale: 2.0;
+}
+
+@keyframes glow {
+    from { filter: brightness(1); }
+    to { filter: brightness(1.3); }
 }
 
 @keyframes doorOpen {
@@ -198,6 +284,70 @@
     .game-section {
         margin: 0;
     }
+}
+
+
+
+.game-description-container {
+    position: absolute;
+    bottom: 150px; 
+    width: 80%;
+    background-color: #2F2A3F;
+    border: 4px solid #D9B88F;
+    padding: 20px;
+    animation: slideDown 0.3s ease-out forwards;
+    overflow: hidden;
+    
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.typing-text {
+    color: #D9B88F;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 2s steps(50, end);
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+
+
+.game-description-container.exiting {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+
+
+.typing-text {
+    color: #D9B88F;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 2s steps(50, end);
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
 }
 
 @media (max-width: 768px) {

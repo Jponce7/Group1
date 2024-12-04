@@ -1,7 +1,7 @@
 import React from 'react'
 import { signOut } from 'firebase/auth'
 import { auth } from '../firebase/config'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { setUser } from '../store/usersSlice'
 import { setActiveProfile, setProfiles } from '../store/profilesSlice'
 import { persistor } from '../store/store'
@@ -27,11 +27,11 @@ function Header() {
         })
     }
   }
-
+  
 
   function handleChangeProfile() {
     dispatch(setActiveProfile(null))
-    dispatch(setProfiles([])) 
+    dispatch(setProfiles([]))
     navigate('/profileselection')
   }
 
@@ -48,8 +48,8 @@ function Header() {
 
         .header {
           position: absolute;
-          top: 10px;
-          right: 10px;
+          top: 5px;
+          right: 150px;
           display: flex;
           gap: 10px;
         }
@@ -58,29 +58,53 @@ function Header() {
           font-family: 'Press Start 2P', cursive;
           font-size: 12px;
           padding: 10px 15px;
-          border: none;
+          border: 2px solid #f7d794;
           cursor: pointer;
           position: relative;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+          overflow: hidden;
+        }
+
+        .btn::before {
+          content: '';
+          position: absolute;
           top: 0;
-          transition: top 0.1s;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: repeating-linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(255, 255, 255, 0.1) 1%,
+            transparent 2%
+          );
+          pointer-events: none;
         }
 
         .btn.primary {
           background-color: #5BA58C;
-          color: #2F2A3F;
-          box-shadow: 0 4px 0 #3D7A68;
+          color: #F7D794;
+          box-shadow: 
+            inset 0 0 10px rgba(47, 42, 63, 0.5),
+            0 4px 0 #3D7A68;
         }
 
         .btn.secondary {
           background-color: #A66E5A;
-          color: #D9B88F;
-          box-shadow: 0 4px 0 #7A4E3D;
-          z-index: 1000; 
+          color: #F7D794;
+          box-shadow: 
+            inset 0 0 10px rgba(247, 215, 148, 0.5),
+            0 4px 0 #7A4E3D;
+        }
+
+        .btn:hover {
+          transform: translateY(2px);
         }
 
         .btn:active {
-          top: 4px;
-          box-shadow: 0 0 0 #000;
+          transform: translateY(4px);
+          box-shadow: none;
         }
 
         @media (max-width: 768px) {

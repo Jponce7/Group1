@@ -12,8 +12,16 @@ import './MainMenu.css';
 function MainMenu() {
   const [isOpening, setIsOpening] = useState(Array(4).fill(false));
   const [isClosing, setIsClosing] = useState(Array(4).fill(false));
+  const [hoveredDoor, setHoveredDoor] = useState(null);
 
   const activeProfile = useSelector((state) => state.profiles.activeProfile);
+
+  const descriptions = [
+    'The classic card matching game. Match ALL of the pairs to win!',
+    'Use your memory to reveal the path, can you remember the sequence?',
+    'A quiz memory game that will test your knowledge!',
+    'Can you guess the missing letters in the words?'
+  ];
 
   const getGameInfo = (gameName) => {
     if (!activeProfile || !activeProfile.games || !activeProfile.games[gameName]) {
@@ -49,14 +57,14 @@ function MainMenu() {
 
   const gameNames = ['CardMatching', 'RevealThePath', 'SimonSays', 'MissingLetters'];
   const paths = ['/cardmatching', '/revealthepath', '/simonsays', '/missletters'];
-  const displayNames = ['Card Matching', 'Reveal the Path', 'Simon Says', 'Missing Letters'];
+  const displayNames = ['Card\nMatching', 'Reveal the Path', 'Simon Says', 'Missing Letters'];
 
   return (
     <div className="main-menu">
       <Header pageTitle="Main Menu" />
       {activeProfile && (
         <div className="welcome-message">
-          <span>Welcome, {activeProfile.nickname}!</span>
+          <span>Welcome Back, {activeProfile.nickname}!</span>
         </div>
       )}
       <div className="menu-container">
@@ -66,7 +74,7 @@ function MainMenu() {
             const gameInfo = getGameInfo(gameName);
             return (
               <div key={index} className="game-section">
-                <div className="game-details-container">
+                <div className={`game-details-container ${hoveredDoor !== null && hoveredDoor !== index ? 'dimmed' : ''}`}>
                   <h2 className="game-title">{displayNames[index]}</h2>
                   <div className="game-stats">
                     <div className="stats-column">
@@ -77,7 +85,7 @@ function MainMenu() {
                         {getBadgeLevel(gameName, 'Easy') === 0 ? (
                           <span>E</span>
                         ) : (
-                          <Badges 
+                          <Badges
                             gameType={gameName}
                             level={getBadgeLevel(gameName, 'Easy')}
                           />
@@ -92,7 +100,7 @@ function MainMenu() {
                         {getBadgeLevel(gameName, 'Hard') === 0 ? (
                           <span>H</span>
                         ) : (
-                          <Badges 
+                          <Badges
                             gameType={gameName}
                             level={getBadgeLevel(gameName, 'Hard')}
                           />
@@ -102,10 +110,11 @@ function MainMenu() {
                   </div>
                 </div>
                 <div className="door-wrapper">
-                  <Link 
-                    to={path} 
+                  <Link
+                    to={path}
                     className="door-container"
                     onMouseEnter={() => {
+                      setHoveredDoor(index);
                       setIsOpening(prev => {
                         const newState = [...prev];
                         newState[index] = true;
@@ -118,6 +127,7 @@ function MainMenu() {
                       });
                     }}
                     onMouseLeave={() => {
+                      setHoveredDoor(null);
                       setIsOpening(prev => {
                         const newState = [...prev];
                         newState[index] = false;
@@ -130,8 +140,10 @@ function MainMenu() {
                       });
                     }}
                   >
-                    <div 
-                      className={`door-image ${isOpening[index] ? 'opening' : ''} ${isClosing[index] ? 'closing' : ''}`}
+                    <div
+                      className={`door-image ${isOpening[index] ? 'opening' : ''} 
+                                    ${isClosing[index] ? 'closing' : ''} 
+                                    ${hoveredDoor !== null && hoveredDoor !== index ? 'dimmed' : ''}`}
                       onAnimationEnd={() => handleAnimationEnd(index)}
                     />
                   </Link>
@@ -140,8 +152,14 @@ function MainMenu() {
             );
           })}
         </div>
+        {hoveredDoor !== null && (
+          <div className="game-description-container">
+            <p className="typing-text">{descriptions[hoveredDoor]}</p>
+          </div>
+        )}
         <Link to="/settings" className="settings-link">
           <FontAwesomeIcon icon={faCog} />
+          <span className="settings-text">User Settings</span>
         </Link>
         <h1 className="spectroom-title">Welcome to SpectRoom</h1>
       </div>

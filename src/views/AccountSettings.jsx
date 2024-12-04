@@ -19,6 +19,11 @@ function AccountSettings() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [noPersonalData, setNoPersonalData] = useState(false);
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState(null);
+  const [isShaking, setIsShaking] = useState(false);
   
   const [email, setEmail] = useState('');
   
@@ -91,6 +96,23 @@ function AccountSettings() {
       password
     );
     await reauthenticateWithCredential(auth.currentUser, credential);
+  };
+
+  const handleAuthenticate = async (e) => {
+    e.preventDefault();
+    try {
+      const credential = EmailAuthProvider.credential(
+        auth.currentUser.email,
+        authPassword
+      );
+      await reauthenticateWithCredential(auth.currentUser, credential);
+      setIsAuthenticated(true);
+      setAuthError(null);
+    } catch (error) {
+      setAuthError('Incorrect password');
+      setIsShaking(true);
+      setTimeout(() => setIsShaking(false), 500);
+    }
   };
 
   const handlePasswordChange = async (e) => {
@@ -227,6 +249,39 @@ function AccountSettings() {
     return <div className="loading-spinner">Loading...</div>;
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="account-settings">
+        <div className="account-settings-container">
+          <button onClick={() => navigate('/profileselection')} className="back-button">
+            Back
+          </button>
+          
+          <h1 className="settings-title">Settings</h1>
+
+          <div className={`auth-content ${isShaking ? 'shake' : ''}`}>
+            <p className="auth-message">Please enter password to edit settings</p>
+            {authError && <div className="error-message">{authError}</div>}
+            <form onSubmit={handleAuthenticate} className="auth-form">
+              <div className="form-control">
+                <input
+                  type="password"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+              <button type="submit" className="btn-secondary">
+                Continue
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="account-settings">
       <div className="account-settings-container">
@@ -262,26 +317,26 @@ function AccountSettings() {
             
             {!isChangingPassword ? (
               <div className="account-section">
-              <h3>Email</h3>
-              <div className="email-display">
-                <input type="email" value={email} disabled />
+                <h3>Email</h3>
+                <div className="email-display">
+                  <input type="email" value={email} disabled />
+                </div>
+              
+                <div className="account-actions">
+                  <button 
+                    onClick={() => setIsChangingPassword(true)} 
+                    className="btn-change-password"
+                  >
+                    Change Password
+                  </button>
+                  <button 
+                    onClick={handleDeleteAccount} 
+                    className="btn-delete-account"
+                  >
+                    Delete Account
+                  </button>
+                </div>
               </div>
-            
-              <div className="account-actions">
-                <button 
-                  onClick={() => setIsChangingPassword(true)} 
-                  className="btn-change-password"
-                >
-                  Change Password
-                </button>
-                <button 
-                  onClick={handleDeleteAccount} 
-                  className="btn-delete-account"
-                >
-                  Delete Account
-                </button>
-              </div>
-            </div>
             ) : (
               <div className="change-password-form">
                 <h3>Change Password</h3>
