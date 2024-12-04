@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateProfileGameProgress } from '../store/profilesSlice';
 import './GameMissingLetters.css';
-import { db } from '../firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
 
 const GameMissingLetters = () => {
   const dispatch = useDispatch();
@@ -19,15 +17,26 @@ const GameMissingLetters = () => {
 
   // Fetch word data from Firestore (Example Firestore structure)
   const fetchWordData = async () => {
-    // Simulate fetching data by returning a mock object
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          word: 'developer',
-          missingIndexes: [0, 3, 5],
-        });
-      }, 100); // Simulate a small delay
-    });
+    if (!activeProfile) return null;
+  
+    // Example: Use the activeProfile's nickname as the word
+    const word = activeProfile.nickname || 'default';
+  
+    const missingIndexes = [];
+    const numRows = Math.ceil(word.length / 3); // Split into rows of 3 characters max
+  
+    for (let row = 0; row < numRows; row++) {
+      // Ensure at least one missing letter in each row
+      const start = row * 3;
+      const end = Math.min(start + 3, word.length); // Ensure we don't go out of bounds
+      const rowIndexes = Array.from({ length: end - start }, (_, i) => i + start);
+  
+      // Randomly pick one letter to be missing in this row
+      const randomIndex = rowIndexes[Math.floor(Math.random() * rowIndexes.length)];
+      missingIndexes.push(randomIndex);
+    }
+  
+    return { word, missingIndexes };
   };
 
   // Initialize game
