@@ -183,18 +183,18 @@
     position: absolute;
     bottom: 50px;
     right: 100px;
-    font-size: 24px;
+    font-size: 72px; /* adjust this */
     color: #D9B88F;
     z-index: 1000;
     display: flex;
     align-items: center;
-    scale: 3.0;
+    scale: 1.0; /* adjust this */
 }
 
 .settings-text {
     font-family: 'Press Start 2P', monospace;
     color: #D9B88F;
-    font-size: 8px;
+    font-size: 24px; /* adjust this */
     text-shadow: 0 0 10px rgba(217, 184, 143, 0.8),
                  0 0 20px rgba(217, 184, 143, 0.5),
                  0 0 30px rgba(217, 184, 143, 0.3),
@@ -242,6 +242,7 @@
 .spectroom-title {
     position: absolute;
     bottom: 50px;
+    left: 200px; /* adjust this */
     font-family: 'Press Start 2P', monospace;
     color: #5BA58C;
     text-shadow: 0 0 10px rgba(91, 165, 140, 0.8),
@@ -253,9 +254,9 @@
                  -2px 2px 0 #D9B88F,
                  3px 3px 0 #2F2A3F; 
     animation: glow 2s ease-in-out infinite alternate;
-    letter-spacing: 10px;
+    letter-spacing: 7px; /* adjust this */
     font-size: 28px;
-    scale: 2.0;
+    scale: 1.5; /* adjust this */
 }
 
 @keyframes glow {

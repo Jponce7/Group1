@@ -49,7 +49,7 @@ function Header() {
         .header {
           position: absolute;
           top: 5px;
-          right: 150px;
+          right: 50px; /* adjust this */
           display: flex;
           gap: 10px;
         }

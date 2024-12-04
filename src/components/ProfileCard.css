@@ -41,8 +41,8 @@
 }
 
 .profile-picture {
-  width: 550px;   
-  height: 400px;  
+  width: 400px;    /* adjust this */
+  height: 300px;   /* adjust this */
   background-color: #2F2A3F;
   border: 4px solid #D9B88F;
   display: flex;
