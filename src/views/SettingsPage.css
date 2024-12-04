@@ -2,26 +2,28 @@
 
 .settings-page {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh; 
   padding: 20px;
   background-image: url('../assets/Settings.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   font-family: 'Press Start 2P', cursive;
+  overflow: hidden; 
 }
 
 .settings-container {
   max-width: 1200px;   
   min-height: 800px;    
-  margin: 150px auto;     /* adjust this */  
-  margin-left: 505px;    /* adjust this */   
+  margin: 50px auto;     /* adjust this */  
+  margin-left: 460px;    /* adjust this */   
   padding: 40px;        /* adjust this */  
   background-color: #3F3A4F;
   border: 4px solid #D9B88F;
   box-shadow: 0 4px 0 #2F2A3F, 4px 4px 0 #2F2A3F;
   position: relative;     
-  overflow-y: auto;        
+  overflow-y: auto; 
+  scale: .8;       
 }
 
 .back-button {
@@ -242,9 +244,9 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  margin: 40px auto;       /* adjust this */ 
-  margin-left: -140px;  /* adjust this */
-  scale: .75; /* adjust this */
+  margin: -20px auto;       /* adjust this */ 
+  margin-left: -40px;  /* adjust this */
+  scale: .70; /* adjust this */
 }
 
 .character-select-container {
